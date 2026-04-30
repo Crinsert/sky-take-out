@@ -1,16 +1,21 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +25,7 @@ import org.springframework.util.DigestUtils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -74,6 +80,43 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setUpdateUser(BaseContext.getCurrentId());
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
         employeeMapper.save(employee);
+    }
+    @Override
+    public PageResult page(EmployeePageQueryDTO employeePageQueryDTO) {
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+        List<Employee> page = employeeMapper.page(employeePageQueryDTO);
+        Page<Employee> employeePage = (Page<Employee>) page;
+        PageResult pageResult = new PageResult(employeePage.getTotal(), employeePage.getResult());
+        return pageResult;
+    }
+
+    @Override
+    public Employee getById(Long id) {
+       return employeeMapper.getById(id);
+
+    }
+
+    @Override
+    public void update(Employee employee) {
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setCreateTime(LocalDateTime.now());
+        employeeMapper.update(employee);
+    }
+
+    @Override
+    public void editPassword(PasswordEditDTO passwordEditDTO) {
+        String s = DigestUtils.md5DigestAsHex(passwordEditDTO.getNewPassword().getBytes());
+        String s1 = DigestUtils.md5DigestAsHex(passwordEditDTO.getOldPassword().getBytes());
+        passwordEditDTO.setNewPassword(s);
+        passwordEditDTO.setOldPassword(s1);
+        employeeMapper.editpassWordd(passwordEditDTO);
+    }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        employeeMapper.startOrStop(status, id);
     }
 
 }

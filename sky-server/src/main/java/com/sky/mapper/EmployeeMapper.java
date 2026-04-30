@@ -1,10 +1,15 @@
 package com.sky.mapper;
 
 import com.sky.dto.EmployeeDTO;
+import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
+import com.sky.result.PageResult;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface EmployeeMapper {
@@ -23,4 +28,14 @@ public interface EmployeeMapper {
             "#{idNumber}, #{status}, #{createTime}, #{updateTime}" +
             ", #{createUser}, #{updateUser})")
     void save(Employee employee);
+
+    List<Employee> page(EmployeePageQueryDTO employeePageQueryDTO);
+
+    Employee getById(Long id);
+
+    void update(Employee employee);
+
+    void editpassWordd(PasswordEditDTO passwordEditDTO);
+
+    void startOrStop(Integer status, Long id);
 }

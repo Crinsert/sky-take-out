@@ -1,10 +1,15 @@
 package com.sky.controller.admin;
 
+import com.github.pagehelper.Page;
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
@@ -12,8 +17,10 @@ import com.sky.vo.EmployeeLoginVO;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.beans.DesignMode;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,14 +67,6 @@ public class EmployeeController {
 
         return Result.success(employeeLoginVO);
     }
-    @PostMapping
-    @ApiOperation("新增员工")
-    public Result save(@RequestBody EmployeeDTO employeeDTO) throws NoSuchAlgorithmException {
-        log.info("新增员工：{}", employeeDTO);
-        employeeService.save(employeeDTO);
-        return Result.success();
-    }
-
     /**
      * 退出
      *
@@ -77,5 +76,56 @@ public class EmployeeController {
     public Result<String> logout() {
         return Result.success();
     }
+
+
+    //TODO测试
+    @PutMapping("editPassword")
+    @ApiOperation("修改密码")
+    public Result editPassword(@RequestBody PasswordEditDTO passwordEditDTO) {
+        log.info("修改密码：{}", passwordEditDTO);
+        employeeService.editPassword(passwordEditDTO);
+        return Result.success();
+    }
+
+    @PostMapping("/status/{status}")
+    @ApiOperation("员工状态禁用/启用")
+    public Result startOrStop(@PathVariable Integer status,@RequestParam Long id) {
+        log.info("员工状态禁用/启用：{}, id: {}", status, id);
+        employeeService.startOrStop(status, id);
+        return Result.success();
+    }
+
+    @GetMapping("/page")
+    @ApiOperation("员工分页查询")
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
+        log.info("员工分页查询：{}", employeePageQueryDTO);
+        PageResult pageResult=employeeService.page(employeePageQueryDTO);
+        return Result.success(pageResult);
+    }
+
+    @PostMapping
+    @ApiOperation("新增员工")
+    public Result save(@RequestBody EmployeeDTO employeeDTO) throws NoSuchAlgorithmException {
+        log.info("新增员工：{}", employeeDTO);
+        employeeService.save(employeeDTO);
+        return Result.success();
+    }
+
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询员工")
+    public Result<Employee> getById(@PathVariable Long id) {
+        log.info("根据id查询员工：{}", id);
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+    @PutMapping
+    @ApiOperation("编辑员工信息")
+    public Result update(@RequestBody Employee employee) {
+        log.info("员工信息修改：{}", employee);
+        employeeService.update(employee);
+        return Result.success();
+    }
+
 
 }
