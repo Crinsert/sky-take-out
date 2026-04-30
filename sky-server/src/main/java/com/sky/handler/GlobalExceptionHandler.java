@@ -28,7 +28,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public Result exceptionHandler(SQLIntegrityConstraintViolationException ex){
         log.error("异常信息：{}", ex.getMessage());
-        //打印异常堆栈信息
         String[] split = ex.getMessage().split(" ");
         String emp_usename = split[2];
         return Result.error("用户名"+emp_usename+"已存在");
