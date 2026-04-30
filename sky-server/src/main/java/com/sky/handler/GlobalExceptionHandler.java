@@ -25,7 +25,6 @@ public class GlobalExceptionHandler {
         log.error("异常信息：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
-    //java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '展红' for key 'employee.idx_username'] with root cause
     @ExceptionHandler
     public Result exceptionHandler(SQLIntegrityConstraintViolationException ex){
         log.error("异常信息：{}", ex.getMessage());
