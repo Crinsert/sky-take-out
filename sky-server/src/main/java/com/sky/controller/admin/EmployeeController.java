@@ -78,7 +78,6 @@ public class EmployeeController {
     }
 
 
-    //TODO测试
     @PutMapping("editPassword")
     @ApiOperation("修改密码")
     public Result editPassword(@RequestBody PasswordEditDTO passwordEditDTO) {
