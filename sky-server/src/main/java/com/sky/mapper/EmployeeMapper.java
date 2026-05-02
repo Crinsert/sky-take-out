@@ -1,9 +1,11 @@
 package com.sky.mapper;
 
+import com.sky.annotation.AutoFill;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
+import com.sky.enumeration.OperationType;
 import com.sky.result.PageResult;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -27,15 +29,19 @@ public interface EmployeeMapper {
             "values (#{username}, #{name}, #{password}, #{phone}, #{sex}, " +
             "#{idNumber}, #{status}, #{createTime}, #{updateTime}" +
             ", #{createUser}, #{updateUser})")
+    @AutoFill(value = OperationType.INSERT)
     void save(Employee employee);
 
     List<Employee> page(EmployeePageQueryDTO employeePageQueryDTO);
 
     Employee getById(Long id);
 
+    @AutoFill(value = OperationType.UPDATE)
     void update(Employee employee);
 
+    @AutoFill(value = OperationType.UPDATE)
     void editpassWordd(PasswordEditDTO passwordEditDTO);
 
+    @AutoFill(value = OperationType.UPDATE)
     void startOrStop(Integer status, Long id);
 }
