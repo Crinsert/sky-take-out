@@ -21,4 +21,14 @@ public interface DishService {
 
     void delete(List<Long> ids);
 
+    DishVO getByIdWithFlavor(Long id);
+
+    List<Dish> list(Integer categoryId);
+
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    List<DishVO> listWithFlavor(Dish dish);
 }

@@ -2,12 +2,16 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -27,7 +31,8 @@ public class DishServiceImpl implements DishService {
     private DishMapper dishMapper;
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
-
+    @Autowired
+    private SetmealMapper setmealMapper;
     @Transactional
     @Override
     public void save(DishDTO dishDTO) {
@@ -70,8 +75,63 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public void delete(List<Long> ids) {
-        dishMapper.delete(ids);
+        //起售的菜品不能删除
+        List<Dish> dishList = dishMapper.deletelist(ids);
+        for (Dish dish : dishList)
+        {
+            if (dish.getStatus() == StatusConstant.ENABLE)
+            {
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+
+        List<Long>steamIds=setmealMapper.getByIds(ids);
+        if (steamIds!=null && steamIds.size()>0)
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        // 批量删除菜品
+        for (Long id : ids){
+            dishMapper.delete(id);
+            dishFlavorMapper.deleteByDishId(id);
+        }
     }
 
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+       DishVO dish = dishMapper.getByIdWithFlavor(id);
+        if (dish != null) {
+            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(id);
+            dish.setFlavors(flavors);
+        }
+       return dish;
+    }
 
+    @Override
+    public List<Dish> list(Integer categoryId) {
+        List<Dish> list =dishMapper.listID(categoryId);
+        return list;
+    }
+
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.list(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
+
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
+    }
 }
