@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.OrderMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into orders(id,number,status,user_id,address_book_id,
+                           order_time,checkout_time,pay_method,amount,
+                           remark,phone,address,consignee)
+        values(#{id},#{number},#{status},#{userId},#{addressBookId},
+               #{orderTime},#{checkoutTime},#{payMethod},#{amount},
+               #{remark},#{phone},#{address},#{consignee})
+    </insert>
+    <update id="update" parameterType="com.sky.entity.Orders">
+        update orders
+        <set>
+            <if test="cancelReason != null and cancelReason!='' ">
+                cancel_reason=#{cancelReason},
+            </if>
+            <if test="rejectionReason != null and rejectionReason!='' ">
+                rejection_reason=#{rejectionReason},
+            </if>
+            <if test="cancelTime != null">
+                cancel_time=#{cancelTime},
+            </if>
+            <if test="payStatus != null">
+                pay_status=#{payStatus},
+            </if>
+            <if test="payMethod != null">
+                pay_method=#{payMethod},
+            </if>
+            <if test="checkoutTime != null">
+                checkout_time=#{checkoutTime},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="deliveryTime != null">
+                delivery_time = #{deliveryTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <update id="reject">
+        update orders
+        set status = #{status},
+        rejection_reason = #{rejectionReason},
+        cancel_time = #{rejectionTime}
+        where id = #{id}
+    </update>
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from orders
+        <where>
+            <if test="_parameter.get('begin') != null">
+                and order_time &gt;= #{begin}
+            </if>
+            <if test="_parameter.get('end') != null">
+                and order_time &lt;= #{end}
+            </if>
+            <if test="_parameter.get('status') != null">
+                and status = #{status}
+            </if>
+            <if test="_parameter.get('categoryId') != null">
+                and category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
+    <select id="conditionSearch" resultType="com.sky.entity.Orders">
+        select * from orders
+        <where>
+            <if test="beginTime != null">
+                and order_time &gt;= #{begin}
+            </if>
+                 <if test="number != null">
+                and number like '%${number}%'
+            </if>
+            <if test="phone != null">
+                and phone like '%${phone}%'
+            </if>
+            <if test="endTime != null">
+                and order_time &lt;= #{end}
+            </if>
+            <if test=" status != null">
+                and status = #{status}
+            </if>
+            <if test="userId != null">
+                and user_id = #{categoryId}
+            </if>
+        </where>
+    </select>
+    <select id="statistics" resultType="com.sky.vo.OrderStatisticsVO">
+        select
+        sum(case when status = 2 then 1 else 0 end) as toBeConfirmed,
+        sum(case when status = 3 then 1 else 0 end) as confirmed,
+        sum(case when status = 4 then 1 else 0 end) as deliveryInProgress
+        from orders
+    </select>
+
+</mapper>
+

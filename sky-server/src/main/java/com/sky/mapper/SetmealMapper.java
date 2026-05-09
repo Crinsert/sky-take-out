@@ -101,5 +101,5 @@ public interface SetmealMapper {
      * @param map
      * @return
      */
-//    Integer countByMap(Map map);
+    Integer countByMap(Map map);
 }

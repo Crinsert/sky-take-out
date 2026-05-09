@@ -97,7 +97,7 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public DishVO getByIdWithFlavor(Long id) {
-       DishVO dish = dishMapper.getByIdWithFlavor(id);
+       DishVO dish = dishMapper.getById(id);
         if (dish != null) {
             List<DishFlavor> flavors = dishFlavorMapper.getByDishId(id);
             dish.setFlavors(flavors);
