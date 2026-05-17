@@ -69,7 +69,7 @@
         select * from orders
         <where>
             <if test="beginTime != null">
-                and order_time &gt;= #{begin}
+                and order_time &gt;= #{beginTime}
             </if>
                  <if test="number != null">
                 and number like '%${number}%'
@@ -78,7 +78,7 @@
                 and phone like '%${phone}%'
             </if>
             <if test="endTime != null">
-                and order_time &lt;= #{end}
+                and order_time &lt;= #{endTime}
             </if>
             <if test=" status != null">
                 and status = #{status}

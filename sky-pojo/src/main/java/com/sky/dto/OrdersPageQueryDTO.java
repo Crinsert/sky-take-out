@@ -19,11 +19,9 @@ public class OrdersPageQueryDTO implements Serializable {
 
     private Integer status;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime beginTime;
+    private String beginTime;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime endTime;
+    private String endTime;
 
     private Long userId;
 
