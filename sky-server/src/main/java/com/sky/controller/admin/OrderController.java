@@ -86,4 +86,5 @@ public class OrderController {
        OrderStatisticsVO orderStatisticsVO =orderService.statistics();
        return Result.success(orderStatisticsVO);
     }
+
 }
